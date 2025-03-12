@@ -1,10 +1,17 @@
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <windows.h>
+#else
 #include <unistd.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include "card.h"
 
 #define PORT 8080
@@ -65,12 +72,13 @@ int main() {
     SOCKET socket_id = socket(AF_INET, SOCK_STREAM, 0);
     #else
     int socket_id = socket(AF_INET, SOCK_STREAM, 0);
-    #endif
+
 
     if (socket_id == -1) {
         perror("Socket creation failed");
         exit(EXIT_FAILURE);
     }
+    #endif
 
     struct sockaddr_in server_address;
     server_address.sin_family = AF_INET;
@@ -106,9 +114,11 @@ int main() {
     char *card_name = full_card_name(&card_buffer);
     printf("Received card: %s\n", card_name);
 
-    close(socket_id);
 
     #ifdef _WIN32
     WSACleanup();
+    closesocket(socket_id);
+    #else
+    close(socket_id);
     #endif
 }

@@ -1,15 +1,19 @@
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <windows.h>
+#else
 #include <unistd.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include "card.h"
 
-#ifdef _WIN32
-#include <winsock2.h>
-#endif
 
 #define PORT 8080
 #define MAX_BUFFER_SIZE 1024
@@ -52,10 +56,12 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    close(socket_id);
 
     #ifdef _WIN32
     WSACleanup();
+    closesocket(socket_id);
+    #else
+    close(socket_id);
     #endif
 
 }
