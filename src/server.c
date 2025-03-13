@@ -17,6 +17,17 @@
 #define PORT 8080
 #define MAX_BUFFER_SIZE 1024
 
+void ExitWithError() {
+    #ifdef _WIN32
+    printf("Usao je u error\n");
+    printf("Error: %d\n", WSAGetLastError());
+    WSACleanup();
+    #else
+    perror(errorMsg);
+    #endif
+    exit(EXIT_FAILURE);
+}
+
 char* full_card_name(CARD *card) {
     char suit[10];
     switch (card->suit) {
@@ -38,20 +49,20 @@ char* full_card_name(CARD *card) {
             return NULL;
     }
 
-    char value[5];
+    char value[6];
     switch (card->value)
     {
         case 1:
-            strncpy(value, "ace", 3);
+            strncpy(value, "ace", 4);
             break;
         case 11:
-            strncpy(value, "jack", 4);
+            strncpy(value, "jack", 5);
             break;
         case 12:
-            strncpy(value, "queen", 5);
+            strncpy(value, "queen", 6);
             break;
         case 13:
-            strncpy(value, "king", 4);
+            strncpy(value, "king", 5);
             break;
         default:
             sprintf(value, "%d", card->value);
@@ -61,6 +72,7 @@ char* full_card_name(CARD *card) {
     char *card_name;
     card_name = malloc(sizeof(char) * 50);
     sprintf(card_name, "%s_of_%s", value, suit);
+    printf("%s\n", card_name);
     return card_name;
 }
 
@@ -72,27 +84,23 @@ int main() {
     SOCKET socket_id = socket(AF_INET, SOCK_STREAM, 0);
     #else
     int socket_id = socket(AF_INET, SOCK_STREAM, 0);
-
+    #endif
 
     if (socket_id == -1) {
-        perror("Socket creation failed");
-        exit(EXIT_FAILURE);
+        ExitWithError();
     }
-    #endif
 
     struct sockaddr_in server_address;
     server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = INADDR_ANY;
+    server_address.sin_addr.s_addr = inet_addr("127.0.0.1");
     server_address.sin_port = htons(PORT);
 
     if (bind(socket_id, (struct sockaddr *)&server_address, sizeof(server_address)) < 0) {
-        perror("Bind failed");
-        exit(EXIT_FAILURE);
+        ExitWithError();
     }
 
     if (listen(socket_id, 3) < 0) {
-        perror("Listen failed");
-        exit(EXIT_FAILURE);
+        ExitWithError();
     }
 
     struct sockaddr_in client_address;
@@ -100,20 +108,23 @@ int main() {
     int new_socket_id = accept(socket_id, (struct sockaddr *)&client_address, (socklen_t *)&client_address_length);
 
     if (new_socket_id < 0) {
-        perror("Accept failed");
-        exit(EXIT_FAILURE);
+        ExitWithError();
     }
 
-    CARD card_buffer;
-    int msgbyte = recv(new_socket_id, &card_buffer, sizeof(CARD), 0);
+    char buffer[MAX_BUFFER_SIZE] = {0};
+    int msgbyte = recv(new_socket_id, buffer, sizeof(CARD), 0);
     if (msgbyte == -1) {
-        perror("Receive failed");
-        exit(EXIT_FAILURE);
+        ExitWithError();
     }
+    CARD card_buffer = *(CARD *)buffer;
+    // printf("%d\n", card_buffer.value);
+    // printf("%d\n", card_buffer.suit);
 
     char *card_name = full_card_name(&card_buffer);
+    printf("radi\n");
     printf("Received card: %s\n", card_name);
 
+    free(card_name);
 
     #ifdef _WIN32
     WSACleanup();
