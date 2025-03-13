@@ -11,29 +11,40 @@ cmake ..
 make
 ```
 
+  optimal:
+
+```sh
+cmake .. -G "MinGw Makefiles"
+mingw32-make
+```
+
 In build directory You would have installed client.exe and server.exe if you are on windows or client.out and server.out if You arre on linux.
 
 ## RUN
 
+### Visual Studio
+
+run the solution and build server and client. Than you can open one window of same solution and run server first than client or you can go to the Debug/Release dir and run throw command line.
+
+### MinGW
+
 Than run the server executable with:
 
 ```sh
-./server.exe
+.\server.exe
 ```
+
+```sh
+.\client.exe
+```
+
+### Linux
 
 or if you are on linux
 
 ```sh
 ./server.out
 ```
-
-Leave that running and open a new terminal in same directory (build) and execute client with:
-
-```sh
-./client.exe
-```
-
-or if you are on linux
 
 ```sh
 ./client.out
