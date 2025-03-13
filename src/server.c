@@ -19,8 +19,7 @@
 
 void ExitWithError(const char *errorMessage) {
     #ifdef _WIN32
-    printf("Usao je u error\n");
-    printf("Error: %d\n", WSAGetLastError());
+    printf("%s: %d\n",errorMessage, WSAGetLastError());
     WSACleanup();
     #else
     perror(errorMessage);
@@ -72,7 +71,6 @@ char* full_card_name(CARD *card) {
     char *card_name;
     card_name = malloc(sizeof(char) * 50);
     sprintf(card_name, "%s_of_%s", value, suit);
-    printf("%s\n", card_name);
     return card_name;
 }
 
@@ -111,24 +109,22 @@ int main() {
         ExitWithError("accept() failed");
     }
 
-    char buffer[MAX_BUFFER_SIZE] = {0};
+    char *buffer = malloc(sizeof(CARD));
     int msgbyte = recv(new_socket_id, buffer, sizeof(CARD), 0);
     if (msgbyte == -1) {
         ExitWithError("recv() failed");
     }
+    
     CARD card_buffer = *(CARD *)buffer;
-    // printf("%d\n", card_buffer.value);
-    // printf("%d\n", card_buffer.suit);
-
     char *card_name = full_card_name(&card_buffer);
-    printf("radi\n");
     printf("Received card: %s\n", card_name);
 
     free(card_name);
+    free(buffer);
 
     #ifdef _WIN32
-    WSACleanup();
     closesocket(socket_id);
+    WSACleanup();
     #else
     close(socket_id);
     #endif

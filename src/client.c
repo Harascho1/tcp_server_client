@@ -35,7 +35,7 @@ int main() {
     WSADATA wsaData;
     int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (result != 0) {
-        ExitWithError();
+        ExitWithError("WSAStartup() failed");
     }
     SOCKET socket_id = socket(AF_INET, SOCK_STREAM, 0);
     #else
@@ -53,25 +53,17 @@ int main() {
     if (c == -1) {
         ExitWithError("connect() failed");
     }
-    printf("radi\n");
 
-
-    // Hocu serveru da posaljem KEC PIK
-    CARD card;
-    card.value = value_ace;
-    card.suit = suit_spades;
-    card.selected = 0;
-
+    CARD card = {10, suit_spades, 0};
 
     int msg_byte = send(socket_id, (char*)&card, sizeof(CARD), 0);
     if (msg_byte == -1) {
         ExitWithError("send() failed");
     }
 
-
     #ifdef _WIN32
-    WSACleanup();
     closesocket(socket_id);
+    WSACleanup();
     #else
     close(socket_id);
     #endif
