@@ -17,13 +17,13 @@
 #define PORT 8080
 #define MAX_BUFFER_SIZE 1024
 
-void ExitWithError() {
+void ExitWithError(const char *errorMessage) {
     #ifdef _WIN32
     printf("Usao je u error\n");
     printf("Error: %d\n", WSAGetLastError());
     WSACleanup();
     #else
-    perror(errorMsg);
+    perror(errorMessage);
     #endif
     exit(EXIT_FAILURE);
 }
@@ -87,7 +87,7 @@ int main() {
     #endif
 
     if (socket_id == -1) {
-        ExitWithError();
+        ExitWithError("socket() failed");
     }
 
     struct sockaddr_in server_address;
@@ -96,11 +96,11 @@ int main() {
     server_address.sin_port = htons(PORT);
 
     if (bind(socket_id, (struct sockaddr *)&server_address, sizeof(server_address)) < 0) {
-        ExitWithError();
+        ExitWithError("bind() failed");
     }
 
     if (listen(socket_id, 3) < 0) {
-        ExitWithError();
+        ExitWithError("listen() failed");
     }
 
     struct sockaddr_in client_address;
@@ -108,13 +108,13 @@ int main() {
     int new_socket_id = accept(socket_id, (struct sockaddr *)&client_address, (socklen_t *)&client_address_length);
 
     if (new_socket_id < 0) {
-        ExitWithError();
+        ExitWithError("accept() failed");
     }
 
     char buffer[MAX_BUFFER_SIZE] = {0};
     int msgbyte = recv(new_socket_id, buffer, sizeof(CARD), 0);
     if (msgbyte == -1) {
-        ExitWithError();
+        ExitWithError("recv() failed");
     }
     CARD card_buffer = *(CARD *)buffer;
     // printf("%d\n", card_buffer.value);

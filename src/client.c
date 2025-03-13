@@ -18,13 +18,13 @@
 #define PORT 8080
 #define MAX_BUFFER_SIZE 1024
 
-void ExitWithError() {
+void ExitWithError(const char* errorMessage) {
     #ifdef _WIN32
     printf("Usao je u error\n");
     printf("Error: %d\n", WSAGetLastError());
     WSACleanup();
     #else
-    perror(errorMsg);
+    perror(errorMessage);
     #endif
     exit(EXIT_FAILURE);
 }
@@ -42,8 +42,7 @@ int main() {
     int socket_id = socket(AF_INET, SOCK_STREAM, 0);
     #endif
     if (socket_id == -1) {
-        perror("Socket creation failed");
-        exit(EXIT_FAILURE);
+        ExitWithError("socket() failed");
     }
 
     struct sockaddr_in server_address;
@@ -52,7 +51,7 @@ int main() {
     server_address.sin_port = htons(PORT);
     int c = connect(socket_id, (struct sockaddr *)&server_address, sizeof(server_address));
     if (c == -1) {
-        ExitWithError();
+        ExitWithError("connect() failed");
     }
     printf("radi\n");
 
@@ -66,8 +65,7 @@ int main() {
 
     int msg_byte = send(socket_id, (char*)&card, sizeof(CARD), 0);
     if (msg_byte == -1) {
-        perror("Send failed");
-        exit(EXIT_FAILURE);
+        ExitWithError("send() failed");
     }
 
 

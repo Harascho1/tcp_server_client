@@ -1,4 +1,0 @@
-/home/luka/Documents/projekti/tcp_server/build/CMakeFiles/server.dir
-/home/luka/Documents/projekti/tcp_server/build/CMakeFiles/client.dir
-/home/luka/Documents/projekti/tcp_server/build/CMakeFiles/edit_cache.dir
-/home/luka/Documents/projekti/tcp_server/build/CMakeFiles/rebuild_cache.dir
