@@ -20,8 +20,7 @@
 
 void ExitWithError(const char* errorMessage) {
     #ifdef _WIN32
-    printf("Usao je u error\n");
-    printf("Error: %d\n", WSAGetLastError());
+    printf("Error %s: %d\n", errorMessage, WSAGetLastError());
     WSACleanup();
     #else
     perror(errorMessage);
