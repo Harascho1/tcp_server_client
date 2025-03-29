@@ -45,14 +45,19 @@ int main() {
         ExitWithError("socket() failed");
     }
 
+    printf("WTF\n");
     struct sockaddr_in server_address;
     server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = inet_addr("127.0.0.1");
     server_address.sin_port = htons(PORT);
+    if (inet_pton(AF_INET, "178.220.18.75", &server_address.sin_addr) <= 0) {
+        ExitWithError("inet_pton() failed");
+    }
+    printf("Povezivanje na server...\n");
     int c = connect(socket_id, (struct sockaddr *)&server_address, sizeof(server_address));
-    if (c == -1) {
+    if (c == SOCKET_ERROR) {
         ExitWithError("connect() failed");
     }
+    printf("Povezan na server\n");
 
     CARD card = {10, suit_spades, 0};
 
