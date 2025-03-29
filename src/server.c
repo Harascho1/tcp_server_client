@@ -90,7 +90,7 @@ int main() {
 
     struct sockaddr_in server_address;
     server_address.sin_family = AF_INET;
-    server_address.sin_addr.s_addr = inet_addr("127.0.0.1");
+    server_address.sin_addr.s_addr = INADDR_ANY;
     server_address.sin_port = htons(PORT);
 
     if (bind(socket_id, (struct sockaddr *)&server_address, sizeof(server_address)) < 0) {
@@ -104,6 +104,8 @@ int main() {
     struct sockaddr_in client_address;
     int client_address_length = sizeof(client_address);
     int new_socket_id = accept(socket_id, (struct sockaddr *)&client_address, (socklen_t *)&client_address_length);
+
+    printf("Client connected\n");
 
     if (new_socket_id < 0) {
         ExitWithError("accept() failed");
