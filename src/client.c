@@ -54,7 +54,7 @@ int main() {
     }
     printf("Povezivanje na server...\n");
     int c = connect(socket_id, (struct sockaddr *)&server_address, sizeof(server_address));
-    if (c == SOCKET_ERROR) {
+    if (c == -1) {
         ExitWithError("connect() failed");
     }
     printf("Povezan na server\n");
